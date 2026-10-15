@@ -15,6 +15,11 @@ channel, not by how big the channel is.
 
 ## Install
 
+**ChatGPT and Codex (experimental):** An OpenAI-compatible `yt-script` adapter is
+available in [`openai/`](openai/README.md), with installation instructions,
+Arabic/English hook scoring, and tests. This first port covers `yt-script`
+only; the ten other skills remain Claude-oriented.
+
 Paste this into Claude:
 
 ```

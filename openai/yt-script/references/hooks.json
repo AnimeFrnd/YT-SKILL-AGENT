@@ -1,0 +1,301 @@
+{
+  "version": "1.0-eg-chatgpt",
+  "source": "https://github.com/Jakeschincariol/youtube-agent-skill/tree/main/skills/yt-script",
+  "note": "21 hook formulas adapted for Arabic/Egyptian technical scripts. These are writing structures and heuristic matching cues; not predictors of virality.",
+  "rules": [
+    "Confirm the title promise immediately.",
+    "One idea per opening.",
+    "Use specificity and evidence, not hype.",
+    "Show promised technical artifacts on screen early.",
+    "Skip formal channel intros in the first seconds."
+  ],
+  "hooks": [
+    {
+      "id": "the-statistic",
+      "name": "The Statistic",
+      "shape": "Lead with a sourced surprising number and the consequence",
+      "match": [
+        "\\b\\d+(\\.\\d+)?\\s?%",
+        "\\b\\d+ (out of|in) \\d+\\b",
+        "\\b\\d{2,}(,\\d{3})+\\b"
+      ],
+      "match_ar": [
+        "[%٪]",
+        "\\d+\\s*(من|في)\\s*\\d+"
+      ]
+    },
+    {
+      "id": "someone-elses-result",
+      "name": "Someone Else’s Result",
+      "shape": "Name a verifiable creator or team outcome, then explore how",
+      "match": [
+        "\\bthis (channel|guy|creator|account)\\b",
+        "\\bwent from .* to\\b",
+        "\\bin (a|one|two|three|\\d+) (week|month|year)s?\\b"
+      ],
+      "match_ar": [
+        "من .* (ل|إلى|الى)\\s*\\d+",
+        "(قناة|فريق|شركة) .* (عمل|وصل|حقق)"
+      ]
+    },
+    {
+      "id": "the-mistake",
+      "name": "The Mistake",
+      "shape": "Name a specific error the viewer might actually be making",
+      "match": [
+        "\\byou('re| are) (probably |still )?(doing|making)\\b",
+        "\\bthe (mistake|reason) (everyone|most people|nobody)\\b",
+        "\\bstop (doing )?\\b"
+      ],
+      "match_ar": [
+        "(غلط|الغلطة|المشكلة|بتغلط|بتعمل كده|السبب)"
+      ]
+    },
+    {
+      "id": "contrarian-flip",
+      "name": "Contrarian Flip",
+      "shape": "Challenge familiar advice and explain the real alternative",
+      "match": [
+        "\\beveryone (says|thinks|tells you)\\b",
+        "\\bis (actually )?wrong\\b",
+        "\\bnobody (tells|talks about)\\b"
+      ],
+      "match_ar": [
+        "(كل الناس|الكل|بيقولك|بيقولوا)",
+        "(بس الحقيقة|لكن|مش صح|العكس)"
+      ]
+    },
+    {
+      "id": "the-reveal",
+      "name": "The Reveal",
+      "shape": "Promise to show a specific proof or artifact quickly",
+      "match": [
+        "\\bI('m| am) going to show you\\b",
+        "\\bhere('s| is) (the|exactly)\\b",
+        "\\bon screen\\b"
+      ],
+      "match_ar": [
+        "(هوريك|هوريكم|هتشوف|بص على|شوف)",
+        "(قدامك|على الشاشة|بالظبط|بالضبط)"
+      ]
+    },
+    {
+      "id": "the-superlative",
+      "name": "The Superlative",
+      "shape": "Name the best, worst or fastest option, with evidence",
+      "match": [
+        "\\bthe (best|worst|fastest|easiest|only)\\b",
+        "\\bnumber one\\b"
+      ],
+      "match_ar": [
+        "(أحسن|افضل|أفضل|أسوأ|أسرع|أبسط|الوحيد)"
+      ]
+    },
+    {
+      "id": "the-clock",
+      "name": "The Clock",
+      "shape": "Time-bound the payoff; only promise a true duration",
+      "match": [
+        "\\bin (the next )?\\d+ (seconds|minutes|hours)\\b",
+        "\\bby the end of this video\\b",
+        "\\bunder \\d+\\b"
+      ],
+      "match_ar": [
+        "\\d+\\s*(ثانية|ثواني|دقيقة|دقايق|ساعة)",
+        "(قبل ما الفيديو يخلص|في أقل من)"
+      ]
+    },
+    {
+      "id": "i-tried-it",
+      "name": "I Tried It",
+      "shape": "Describe a real first-person experiment and cost",
+      "match": [
+        "\\bI (tried|spent|tested|let|gave)\\b",
+        "\\bfor \\d+ (days|weeks|months)\\b",
+        "\\bso you don'?t have to\\b"
+      ],
+      "match_ar": [
+        "(جربت|اختبرت|عملت تجربة|قعدت)",
+        "\\d+\\s*(يوم|أيام|اسبوع|أسبوع|شهر)"
+      ]
+    },
+    {
+      "id": "the-question",
+      "name": "The Question",
+      "shape": "Ask the exact question a viewer is trying to solve",
+      "match": [
+        "^(why|how|what|when|should|can|do|does|is)\\b",
+        "\\?\\s*$"
+      ],
+      "match_ar": [
+        "^(ليه|إزاي|ازاي|ايه|إيه|إمتى|امتى|ازاي|طب ليه)",
+        "[؟?]"
+      ]
+    },
+    {
+      "id": "the-before-after",
+      "name": "Before and After",
+      "shape": "Contrast two states with a visible artifact",
+      "match": [
+        "\\bbefore\\b.*\\bafter\\b",
+        "\\bthis was\\b.*\\bthis is\\b",
+        "\\bused to\\b"
+      ],
+      "match_ar": [
+        "(قبل|زمان).*?(بعد|دلوقتي)",
+        "(كان .* بقى|كان .* دلوقتي)"
+      ]
+    },
+    {
+      "id": "the-teardown",
+      "name": "The Teardown",
+      "shape": "Take a real technical example apart in public",
+      "match": [
+        "\\b(broke|break|breaking) (it )?down\\b",
+        "\\bteardown\\b",
+        "\\banalys(ed|ed|is|e)\\b",
+        "\\bI pulled\\b"
+      ],
+      "match_ar": [
+        "(حللت|هنحلل|نفكك|هنفكك|نفهم جواه|تفكيك)"
+      ]
+    },
+    {
+      "id": "the-stack",
+      "name": "The Stack",
+      "shape": "Combine two named tools to unlock an outcome",
+      "match": [
+        "\\b\\w+ (plus|\\+) \\w+\\b",
+        "\\bcombine\\b",
+        "\\btogether\\b"
+      ],
+      "match_ar": [
+        "\\s\\+\\s",
+        "(مع بعض|هنجمع|هنوصل|تجمع)"
+      ]
+    },
+    {
+      "id": "the-warning",
+      "name": "The Warning",
+      "shape": "Show the realistic cost of doing something before checking it",
+      "match": [
+        "\\bdo not\\b",
+        "\\bdon'?t (upload|post|publish|start)\\b",
+        "\\bbefore you\\b",
+        "\\bstop\\b"
+      ],
+      "match_ar": [
+        "(متعملش|اوعى|إوعى|خلي بالك|قبل ما|بلاش|متشتريش|ماتعملش)"
+      ]
+    },
+    {
+      "id": "the-list",
+      "name": "The List",
+      "shape": "Count genuinely different items and deliver all of them",
+      "match": [
+        "^\\d+ \\w+",
+        "\\b(here are|these are) \\d+\\b"
+      ],
+      "match_ar": [
+        "^\\d+\\s+",
+        "(حاجات|خطوات|أسباب|نقط)"
+      ]
+    },
+    {
+      "id": "the-receipt",
+      "name": "The Receipt",
+      "shape": "Show actual analytics, logs, screen or proof first",
+      "match": [
+        "\\bthis is (the|my)\\b",
+        "\\bscreenshot\\b",
+        "\\bproof\\b",
+        "\\breceipts?\\b"
+      ],
+      "match_ar": [
+        "(قدامك|الـ ?Logs|الـ ?Screenshot|الدليل|النتيجة)"
+      ]
+    },
+    {
+      "id": "the-insider",
+      "name": "The Insider",
+      "shape": "Reveal information already available within a real system",
+      "match": [
+        "\\b(nobody|almost nobody|most people) (knows?|opens?|uses?)\\b",
+        "\\bhidden\\b",
+        "\\bburied\\b"
+      ],
+      "match_ar": [
+        "(محدش|قليل|مش واخد بالك|مستخبي|متعرفش)"
+      ]
+    },
+    {
+      "id": "the-impossible",
+      "name": "The Impossible Claim",
+      "shape": "State a surprising but provable outcome and demonstrate early",
+      "match": [
+        "\\bwithout\\b",
+        "\\bnever\\b",
+        "\\bin one\\b",
+        "\\bzero\\b"
+      ],
+      "match_ar": [
+        "(من غير|بدون|ولا مرة|صفر)"
+      ]
+    },
+    {
+      "id": "the-comparison",
+      "name": "The Comparison",
+      "shape": "Compare named solutions and explain the winner in context",
+      "match": [
+        "\\bvs\\.?\\b",
+        "\\bversus\\b",
+        "\\bwhich (one )?(is|wins)\\b",
+        "\\bsame .* (three|two) ways\\b"
+      ],
+      "match_ar": [
+        "(ولا|مقارنة|أحسن من|أفضل من|vs|VS)"
+      ]
+    },
+    {
+      "id": "the-origin",
+      "name": "The Origin",
+      "shape": "Show where a real result or process came from",
+      "match": [
+        "\\bevery (video|post) .* starts\\b",
+        "\\bit all (starts|started)\\b",
+        "\\bthe (real )?reason\\b"
+      ],
+      "match_ar": [
+        "(بدأت من|البداية|السبب الحقيقي|كل .* بيبدأ)"
+      ]
+    },
+    {
+      "id": "the-deadline",
+      "name": "The Deadline",
+      "shape": "Explain a verified time-sensitive change with a real date",
+      "match": [
+        "\\b(this|next) (week|month|year)\\b",
+        "\\bis changing\\b",
+        "\\bno longer\\b",
+        "\\bas of\\b"
+      ],
+      "match_ar": [
+        "(الشهر ده|الاسبوع ده|الأسبوع ده|من يوم|بعد يوم|مش هيشتغل)"
+      ]
+    },
+    {
+      "id": "the-direct-address",
+      "name": "The Direct Address",
+      "shape": "Identify the specific viewer in the first six words",
+      "match": [
+        "^if you\\b",
+        "\\bfor (anyone|everyone|people) who\\b",
+        "\\byou specifically\\b"
+      ],
+      "match_ar": [
+        "^(لو انت|لو إنت|لو أنت|للي|يا اللي)",
+        "(انت شغال|إنت شغال|لو بتشتغل)"
+      ]
+    }
+  ]
+}
