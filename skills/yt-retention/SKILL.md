@@ -17,7 +17,15 @@ python3 retention.py retention.csv --transcript transcript.srt
 ```
 
 Getting the file: Studio -> a video -> Analytics -> Engagement -> the audience-retention chart ->
-the download icon -> "Audience retention".
+the download icon -> "Audience retention". The first nonempty CSV record can label column zero
+`seconds`, `percent`, `%`, `position (seconds)`, `position (percent)`, `position (%)`,
+`video position (seconds)`, `video position (percent)` or `video position (%)`; outer spaces and
+case are ignored. A label applies only when column zero supplies the first numeric position in
+every retained row. A `%` in a successfully parsed retained position cell takes precedence.
+Seconds stay seconds with or without `--duration`. For percent axes, a nonzero `--duration`
+supplies cliff times in seconds and a 30-second hook window; without it or with zero, the hook
+uses the first 10% and cliff times are unavailable. Unlabelled data keeps the
+`max(position) <= 100.5` percent heuristic.
 
 ## Three different problems
 
