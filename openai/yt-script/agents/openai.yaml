@@ -1,0 +1,4 @@
+interface:
+  display_name: "YouTube Script Builder"
+  short_description: "Write hooks and spoken YouTube scripts with on-screen beats"
+  default_prompt: "Write a 60-second YouTube Short on my topic, with five hooks and a scored top two."
