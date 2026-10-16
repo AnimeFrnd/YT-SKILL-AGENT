@@ -12,15 +12,37 @@ Length: YouTube truncates around 60 characters on desktop search and around 40 o
 feed. Both limits are reported because they are different failures - a desktop truncation loses the
 tail, a mobile one can lose the subject.
 """
-import json, re, sys, os
+import json, re, sys, os, unicodedata
 
 DESKTOP, MOBILE, HARD = 60, 40, 100
 VAGUE = {"amazing","incredible","insane","crazy","huge","massive","ultimate","best","powerful",
          "secret","revolutionary","mindblowing","epic","perfect","complete","everything"}
 STOP = {"the","a","an","of","for","to","in","on","and","or","is","are","with","your","you","my","i",
-        "this","that","it","how","what","why"}
+        "this","that","it","how","what","why",
+        "في","من","على","عن","إلى","الى","أن","ان","هو","هي","هذا","هذه"}
 
-def words(t): return re.findall(r"[a-z0-9']+", t.lower())
+def words(t):
+    """Tokenize Unicode text without splitting Arabic or other non-Latin words.
+
+    NFKC/casefold makes matching consistent across scripts and letter case.
+    Ignore Arabic vowel marks and tatweel in comparisons (e.g. كـتاب/كتاب).
+    """
+    text = unicodedata.normalize("NFKC", t).casefold()
+    out, token = [], []
+    for i, char in enumerate(text):
+        category = unicodedata.category(char)
+        if char == "\u0640" or (category.startswith("M") and "ARABIC" in unicodedata.name(char, "")):
+            continue
+        if char != "_" and (category[0] in "LN" or (category[0] == "M" and token)):
+            token.append(char)
+        elif char in ("'", "’") and token and i + 1 < len(text) and text[i + 1].isalnum():
+            token.append("'")
+        elif token:
+            out.append("".join(token))
+            token = []
+    if token:
+        out.append("".join(token))
+    return out
 
 def check(title, thumb=None):
     t = title.strip()
@@ -40,7 +62,7 @@ def check(title, thumb=None):
     nums = re.findall(r"\d[\d,.]*%?", t)
     if nums: good.append(f"carries a concrete figure ({', '.join(nums[:3])})")
     else: issues.append(("no-number", "no number, date or name - the most reliable single fix"))
-    if t.endswith("?"): good.append("open question in the title")
+    if t.endswith(("?", "؟")): good.append("open question in the title")
     front = [w for w in words(t)[:3] if w not in STOP]
     if not front: issues.append(("front-load", "the first three words are all filler - move the subject forward"))
     if thumb:
@@ -69,11 +91,11 @@ def main():
     if "--title" in a:
         rows = [check(a[a.index("--title") + 1], thumb)]
     elif a and os.path.exists(a[0]):
-        rows = [check(l, thumb) for l in open(a[0]).read().splitlines() if l.strip()]
+        rows = [check(l, thumb) for l in open(a[0], encoding="utf-8-sig").read().splitlines() if l.strip()]
     else:
         print(__doc__); sys.exit(1)
     rows.sort(key=lambda r: -r["score"])
-    if as_json: print(json.dumps(rows, indent=1)); return
+    if as_json: print(json.dumps(rows, indent=1, ensure_ascii=False)); return
     for r in rows: show(r)
     print()
 

@@ -33,6 +33,8 @@ python3 title.py titles.txt            # one per line, ranked
   reported because they fail differently: a desktop cut loses the tail, a mobile cut can lose the
   subject.
 - **The thumbnail must not repeat the title.** Different words, same promise.
+- **Multilingual checks** count words in Arabic, mixed Arabic/English, and other Unicode scripts
+  for overlap and thumbnail length; this is lexical matching, not translation or synonym detection.
 - **Three words maximum on the thumbnail.** At feed size a fourth word is a grey smear.
 - **A number, a name or a date** beats every adjective available to you.
 - **Two all-caps words is the ceiling** before a title reads as spam.
