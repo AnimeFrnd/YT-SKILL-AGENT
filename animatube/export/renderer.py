@@ -18,7 +18,7 @@ Progress = Callable[[int, str], None]
 
 def _draw_scene(project: Project, scene: Scene, frame: int, width: int, height: int) -> QImage:
     image = QImage(width, height, QImage.Format.Format_ARGB32_Premultiplied)
-    image.fill(QColor("#11131a"))
+    image.fill(QColor(project.background_color))
     painter = QPainter(image)
     painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)

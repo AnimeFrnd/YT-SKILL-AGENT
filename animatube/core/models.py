@@ -120,6 +120,7 @@ class Project:
     width: int = 1920
     height: int = 1080
     fps: int = 30
+    background_color: str = "#11131a"
     scenes: list[Scene] = field(default_factory=lambda: [Scene()])
     audio_tracks: list[AudioTrack] = field(default_factory=list)
     path: str = ""
@@ -139,6 +140,7 @@ class Project:
             width=int(value.get("width", 1920)),
             height=int(value.get("height", 1080)),
             fps=int(value.get("fps", 30)),
+            background_color=str(value.get("background_color", "#11131a")),
             scenes=[Scene.from_dict(item) for item in value.get("scenes", [])],
             audio_tracks=[AudioTrack.from_dict(item) for item in value.get("audio_tracks", [])],
         )

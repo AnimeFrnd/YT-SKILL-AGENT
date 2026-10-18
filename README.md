@@ -63,7 +63,8 @@ publish time.
   duration, and choose a fade, wipe, slide, or dissolve transition.
 - **Canvas and layers:** add text, rectangles, circles, triangles, and a simple built-in character;
   import PNG/JPEG/SVG/GIF image assets, or drag image files onto the canvas. Select and drag layers
-  directly, reorder them in the layer list, and edit properties in the inspector.
+  directly, reorder them in the layer list, change the canvas background color, and edit properties
+  in the inspector.
 - **Animation:** scrub the frame slider, add keyframes for position, scale, rotation, and opacity,
   choose linear/eased interpolation, or apply fade, slide, bounce, zoom, and text typewriter presets.
   Press Play to preview the scene.

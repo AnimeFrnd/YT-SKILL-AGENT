@@ -36,5 +36,30 @@ def state_at(layer: LayerObject, frame: int) -> dict[str, float]:
     }
 
 
+def set_state_value(layer: LayerObject, frame: int, field: str, value: float, easing: str = "linear") -> None:
+    if field not in ("x", "y", "scale", "rotation", "opacity", "text_progress"):
+        raise ValueError(f"Unsupported animated property: {field}")
+    if frame == 0 and not layer.keyframes and field in ("x", "y"):
+        setattr(layer, field, value)
+        return
+
+    key = next((keyframe for keyframe in layer.keyframes if keyframe.frame == frame), None)
+    state = state_at(layer, frame)
+    if key is None:
+        key = Keyframe(
+            frame=frame,
+            x=state["x"],
+            y=state["y"],
+            scale=state["scale"],
+            rotation=state["rotation"],
+            opacity=state["opacity"],
+            text_progress=state["text_progress"],
+            easing=easing,
+        )
+        layer.keyframes.append(key)
+    setattr(key, field, value)
+    layer.keyframes.sort(key=lambda item: item.frame)
+
+
 def _key_state(key: Keyframe) -> dict[str, float]:
     return {field: float(getattr(key, field)) for field in ("x", "y", "scale", "rotation", "opacity", "text_progress")}

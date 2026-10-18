@@ -39,8 +39,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from animatube.core.animation import state_at
+from animatube.core.animation import set_state_value, state_at
 from animatube.core.models import AudioTrack, Keyframe, LayerObject, Project, Scene
+from animatube.core.profiles import output_dimensions
 from animatube.core.project import load_project, save_project
 from animatube.export.renderer import _draw_scene, render_project
 
@@ -241,14 +242,7 @@ class ExportOptionsDialog(QDialog):
         form.addRow(buttons)
 
     def output_settings(self) -> tuple[tuple[int, int], int]:
-        maximum = {"720p": 720, "1080p": 1080, "4K": 2160}[self.size.currentText()]
-        aspect = self.aspect.currentData()
-        dimensions = (maximum * 16 // 9, maximum) if aspect == "wide" else (
-            (maximum * 9 // 16, maximum) if aspect == "vertical" else (maximum, maximum)
-        )
-        if dimensions[0] % 2:
-            dimensions = (dimensions[0] - 1, dimensions[1])
-        return dimensions, int(self.fps.currentText())
+        return output_dimensions(self.aspect.currentData(), self.size.currentText()), int(self.fps.currentText())
 
 
 class UploadDialog(QDialog):
@@ -416,6 +410,15 @@ class MainWindow(QMainWindow):
         self.autosave_timer.start()
         self._refresh_all()
 
+    def choose_background_color(self) -> None:
+        color = QColorDialog.getColor(QColor(self.project.background_color), self, "Canvas background")
+        if color.isValid():
+            self._snapshot()
+            self.project.background_color = color.name()
+            self._mark_dirty()
+            self._refresh_canvas()
+            self._refresh_scenes()
+
     def _build_ui(self) -> None:
         root = QWidget()
         root_layout = QVBoxLayout(root)
@@ -492,6 +495,9 @@ class MainWindow(QMainWindow):
         self.transition_length.setSuffix(" frames")
         self.transition_length.valueChanged.connect(self._set_transition_length)
         layout.addWidget(self.transition_length)
+        self.background_button = QPushButton("Canvas background")
+        self.background_button.clicked.connect(self.choose_background_color)
+        layout.addWidget(self.background_button)
         self.scene_duration = QSpinBox()
         self.scene_duration.setRange(1, 36000)
         self.scene_duration.setSuffix(" frames")
@@ -704,6 +710,9 @@ class MainWindow(QMainWindow):
         self.scene_list.blockSignals(False)
         if self.project.scenes:
             scene = self.project.scenes[self.scene_index]
+            self.background_button.setStyleSheet(
+                f"background:{self.project.background_color};color:#fff;border:1px solid #45495a;padding:7px"
+            )
             for control in (self.transition, self.transition_length, self.scene_duration):
                 control.blockSignals(True)
             self.transition.setCurrentText(scene.transition)
@@ -838,8 +847,8 @@ class MainWindow(QMainWindow):
             if self.frame == 0 and not layer.keyframes:
                 layer.x, layer.y = x, y
             else:
-                self._store_keyframe_value(layer, "x", x)
-                self._store_keyframe_value(layer, "y", y)
+                set_state_value(layer, self.frame, "x", x, self.easing.currentText())
+                set_state_value(layer, self.frame, "y", y, self.easing.currentText())
             self._mark_dirty()
             self._refresh_canvas()
 
@@ -868,25 +877,10 @@ class MainWindow(QMainWindow):
         self._snapshot()
         if key in ("width", "height"):
             setattr(layer, key, value)
-        elif self.frame == 0 and not layer.keyframes:
-            setattr(layer, key, value)
         else:
-            self._store_keyframe_value(layer, key, value)
+            set_state_value(layer, self.frame, key, value, self.easing.currentText())
         self._mark_dirty()
         self._refresh_canvas()
-
-    def _store_keyframe_value(self, layer: LayerObject, field: str, value: float) -> None:
-        key = next((keyframe for keyframe in layer.keyframes if keyframe.frame == self.frame), None)
-        state = state_at(layer, self.frame)
-        if key is None:
-            key = Keyframe(
-                frame=self.frame, x=state["x"], y=state["y"], scale=state["scale"],
-                rotation=state["rotation"], opacity=state["opacity"],
-                text_progress=state.get("text_progress", 1), easing=self.easing.currentText(),
-            )
-            layer.keyframes.append(key)
-        setattr(key, field, value)
-        layer.keyframes.sort(key=lambda item: item.frame)
 
     def _edit_audio(self, field: str, value: float) -> None:
         if self._inspectors_loading:
@@ -1147,7 +1141,7 @@ class MainWindow(QMainWindow):
             self._refresh_canvas()
 
     def new_project(self) -> None:
-        if self.dirty and QMessageBox.question(self, "New project", "Discard unsaved project changes?") != QMessageBox.StandardButton.Yes:
+        if not self._confirm_replace_project("New project"):
             return
         self.project = Project()
         self.scene_index = self.frame = 0
@@ -1158,6 +1152,8 @@ class MainWindow(QMainWindow):
         self._refresh_all()
 
     def open_project(self) -> None:
+        if not self._confirm_replace_project("Open project"):
+            return
         path, _ = QFileDialog.getOpenFileName(self, "Open AnimaTube project", "", "AnimaTube project (*.anima)")
         if not path:
             return
@@ -1174,6 +1170,22 @@ class MainWindow(QMainWindow):
         self.dirty = False
         self._refresh_all()
         self.statusBar().showMessage(f"Opened {path}", 4000)
+
+    def _confirm_replace_project(self, action: str) -> bool:
+        if not self.dirty:
+            return True
+        prompt = QMessageBox(self)
+        prompt.setWindowTitle(action)
+        prompt.setText("Save changes to the current project before continuing?")
+        save_button = prompt.addButton(QMessageBox.StandardButton.Save)
+        discard_button = prompt.addButton(QMessageBox.StandardButton.Discard)
+        prompt.addButton(QMessageBox.StandardButton.Cancel)
+        prompt.setDefaultButton(save_button)
+        prompt.exec()
+        clicked = prompt.clickedButton()
+        if clicked == save_button:
+            return self.save_project_dialog()
+        return clicked == discard_button
 
     def save_project_dialog(self) -> bool:
         path = self.project.path

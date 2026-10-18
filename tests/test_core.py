@@ -2,8 +2,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from animatube.core.animation import state_at
+from animatube.core.animation import set_state_value, state_at
 from animatube.core.models import AudioTrack, Keyframe, LayerObject, Project, Scene
+from animatube.core.profiles import output_dimensions
 from animatube.core.project import load_project, save_project
 
 
@@ -29,11 +30,42 @@ class AnimationTests(unittest.TestCase):
         self.assertEqual(state_at(layer, 15)["x"], 25)
         self.assertEqual(state_at(layer, 30)["x"], 100)
 
+    def test_frame_zero_transform_edits_are_keyframed_without_fake_layer_attributes(self):
+        layer = LayerObject(x=24, y=48)
+        set_state_value(layer, 0, "scale", 1.5)
+        set_state_value(layer, 0, "rotation", 30)
+        set_state_value(layer, 0, "opacity", 0.4)
+        state = state_at(layer, 0)
+        self.assertEqual((state["x"], state["y"]), (24, 48))
+        self.assertEqual((state["scale"], state["rotation"], state["opacity"]), (1.5, 30, 0.4))
+        self.assertEqual(len(layer.keyframes), 1)
+        self.assertFalse(hasattr(layer, "scale"))
+
+    def test_frame_zero_position_edit_updates_base_layer_when_unanimated(self):
+        layer = LayerObject()
+        set_state_value(layer, 0, "x", 42)
+        self.assertEqual(layer.x, 42)
+        self.assertEqual(layer.keyframes, [])
+        self.assertEqual(state_at(layer, 0)["x"], 42)
+
+    def test_export_profiles_use_even_dimensions(self):
+        self.assertEqual(output_dimensions("wide", "1080p"), (1920, 1080))
+        self.assertEqual(output_dimensions("vertical", "720p"), (404, 720))
+        self.assertEqual(output_dimensions("vertical", "1080p"), (606, 1080))
+        self.assertEqual(output_dimensions("vertical", "4K"), (1214, 2160))
+        self.assertEqual(output_dimensions("square", "1080p"), (1080, 1080))
+        for profile in ("wide", "vertical", "square"):
+            for resolution in ("720p", "1080p", "4K"):
+                width, height = output_dimensions(profile, resolution)
+                self.assertEqual(width % 2, 0)
+                self.assertEqual(height % 2, 0)
+
 
 class ProjectTests(unittest.TestCase):
     def test_project_round_trip_includes_scene_animation_and_audio(self):
         project = Project(
             name="Test",
+            background_color="#223344",
             scenes=[Scene(name="Opening", objects=[LayerObject(
                 name="Title", text="Hello", keyframes=[Keyframe(frame=8, x=120, y=90)]
             )])],
@@ -41,6 +73,7 @@ class ProjectTests(unittest.TestCase):
         )
         restored = Project.from_dict(project.to_dict())
         self.assertEqual(restored.name, "Test")
+        self.assertEqual(restored.background_color, "#223344")
         self.assertEqual(restored.scenes[0].objects[0].keyframes[0].frame, 8)
         self.assertEqual(restored.audio_tracks[0].volume, 0.5)
 
