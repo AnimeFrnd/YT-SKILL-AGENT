@@ -14,8 +14,13 @@ runtime you would land on, and you apply it in whatever editor you use. Nothing 
 """
 import json, os, re, sys
 
-FILLER_ONLY = re.compile(r"^[\s,.-]*((um+|uh+|er+|ah+|so|okay|ok|right|yeah|like|anyway|basically|"
-                         r"actually|you know|i mean|let me see|hold on)[\s,.-]*)+$", re.I)
+FILLER_ONLY = re.compile(r"^[\s,.-]*(("
+                         r"um+|uh+|er+|ah+|so|okay|ok|right|yeah|like|anyway|basically|"
+                         r"actually|you know|i mean|let me see|hold on|"
+                         # RU: the same noises, written how people actually say them
+                         r"ну|э+|мм+|ага|окей|ок|так|вот|значит|короче|как бы|в общем|то есть|"
+                         r"собственно|ладно|да|ну вот|вот так"
+                         r")[\s,.-]*)+$", re.I)
 
 def parse_ts(s):
     s = s.strip().replace(",", ".")
@@ -38,7 +43,9 @@ def load(path):
             cur[2].append(line.strip())
     return [(a, b, " ".join(t)) for a, b, t in cues if t]
 
-def norm(t): return re.sub(r"[^a-z ]", "", t.lower()).split()
+# keep letters in any script: Cyrillic titles and transcripts were being stripped to nothing,
+# which silently disabled the REPEAT check on every Russian file
+def norm(t): return re.sub(r"[^\w\s]|_|\d", " ", t.lower()).split()
 
 def main():
     a = sys.argv[1:]

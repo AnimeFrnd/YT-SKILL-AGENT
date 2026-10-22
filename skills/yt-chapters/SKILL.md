@@ -12,6 +12,9 @@ description: >-
 python3 chapters.py transcript.srt --target 8
 ```
 
+Russian transcripts work: the vocabulary shift and the draft titles are computed on `\w`, and the
+Russian stop-word list keeps "это", "как", "вот" out of every chapter title.
+
 ## The rules, which are not optional
 
 A chapter list that breaks any of these silently does not become chapters at all - the block just

@@ -20,10 +20,18 @@ from deadair import load, parse_ts  # noqa: E402  (same parser, one implementati
 STOP = set("the a an of for to in on and or is are was were be been with this that it as at by from "
            "you your i my we our they them he she but so if then than there here what which who how "
            "when where why not no yes do does did just really very like about into over out up down "
-           "can could will would should have has had get got make made go going went one two".split())
+           "can could will would should have has had get got make made go going went one two "
+           # RU - the words that would otherwise become every chapter title
+           "это этот эта эти тот та то как что чем когда почему зачем где тут там так вот "
+           "я ты мы вы он она они меня тебя нас вас его её их мой моя мои твой твоя твои наш ваш "
+           "и в во на с со к ко о об от до из за по для при про у же ли не но а или бы "
+           "был была было были есть будет можно нужно очень просто вообще короче значит "
+           "такой такая такие которое который которая которые".split())
 
 def keywords(text):
-    return {w for w in re.findall(r"[a-z']{4,}", text.lower()) if w not in STOP}
+    # \w, not [a-z]: a Cyrillic transcript used to score every boundary at zero vocabulary shift
+    # and produce empty draft titles
+    return {w for w in re.findall(r"[\w']{4,}", text.lower()) if w not in STOP}
 
 def mmss(t):
     t = int(t); h, m, s = t // 3600, (t % 3600) // 60, t % 60

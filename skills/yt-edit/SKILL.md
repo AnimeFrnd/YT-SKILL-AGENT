@@ -16,6 +16,9 @@ python3 deadair.py transcript.srt              # srt, vtt or whisper json
 python3 deadair.py transcript.srt --floor 0.35 --json
 ```
 
+Transcripts in any script work: the filler list and the repeat check cover Russian as well as
+English, so a Cyrillic transcript is not silently stripped to nothing.
+
 No transcript yet? Ask for one, or produce one first - `whisper`, `faster-whisper`, or the caption
 track YouTube generates on an unlisted upload all work. Do not guess at timings.
 
@@ -23,7 +26,8 @@ track YouTube generates on an unlisted upload all work. Do not guess at timings.
 
 - **DEAD** - gaps longer than the floor, trimmed from the MIDDLE so both sides keep a breath.
   Cutting flush against speech is what makes a tightened take sound gasping.
-- **FILLER** - cues that are nothing but "um", "so yeah", "basically".
+- **FILLER** - cues that are nothing but "um", "so yeah", "basically", or the Russian equivalents
+  ("ну", "э-э", "короче", "как бы", "то есть").
 - **REPEAT** - a sentence restarted. Compared against the last cue that was actually speech, not
   the literal previous cue, because most retakes have an "um" between the two attempts.
 
