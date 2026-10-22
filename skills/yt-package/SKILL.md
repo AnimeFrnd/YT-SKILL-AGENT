@@ -17,6 +17,11 @@ python3 title.py --title "..." --thumb "AI RAN IT"
 python3 title.py titles.txt            # one per line, ranked
 ```
 
+Write the title and thumbnail in the language the video is in. A Cyrillic title is checked with
+Russian stop words, Russian vague adjectives and Russian explanations; the 60/40 character cuts stay
+as they are, but Cyrillic runs wider per character, so a Russian title that clears 40 can still lose
+its subject on a phone - treat 35 as the practical mobile cut and say so.
+
 ## Before you write
 
 1. Read `~/.claude/youtube/voice.md` if it exists. That is the user's voice profile: how they talk
