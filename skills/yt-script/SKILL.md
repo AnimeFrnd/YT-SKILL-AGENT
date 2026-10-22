@@ -19,6 +19,12 @@ python3 hookscore.py hooks.txt              # rank your hook options
 python3 hookscore.py --hook "one line"      # score a single one
 ```
 
+Write the hooks in the language the user actually speaks on camera. A Cyrillic hook is detected
+automatically and scored against the Russian patterns in `hooks.json` (`match_ru`) with the Russian
+lexicons, and the "weakest property" advice comes back in Russian. Russian scores run low in
+absolute terms because those lexicons are thinner than the English ones - rank the five hooks
+against each other, not against the STRONG band, and say so when you hand the panel over.
+
 ## Before you write
 
 1. Read `~/.claude/youtube/voice.md` if it exists. That is the user's voice profile: how they talk

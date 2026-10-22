@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# per-run output: a script belongs to the user, not to the pack
+output/

@@ -9,6 +9,10 @@ that leaks at the dead one, and averaging hides that.
     python3 hookscore.py --hook "one line"    # score a single hook
     python3 hookscore.py --json hooks.txt     # machine-readable
 
+RUSSIAN. A Cyrillic hook is scored against hooks.json match_ru and the Russian lexicons, then
+reported in Russian. The Russian lexicons are thinner than the English ones, so Russian scores run
+low in absolute terms: compare your five hooks against each other, not against the STRONG band.
+
 WHAT THIS CAN AND CANNOT TELL YOU. Measured against 74 real short-form hooks (first 15 seconds of
 auto-captions, top-8 and bottom-8 by views across five channels): it separates deliberately bad
 hooks from real ones well, and it separates a creator's own hits from their own misses barely at
@@ -20,15 +24,36 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 FORMULAS = json.load(open(os.path.join(HERE, "hooks.json")))["hooks"]
 
 FILLER = {"basically","actually","literally","just","really","very","so","kind","sort","like",
-          "guys","hey","welcome","today","video","subscribe","channel"}
+          "guys","hey","welcome","today","video","subscribe","channel",
+          # RU
+          "просто","вообще","короче","типа","вроде","очень","сегодня","видео","ролик","канал",
+          "подписывайтесь","друзья","всем","привет"}
 VAGUE = {"amazing","incredible","insane","crazy","huge","massive","game","changer","secret",
-         "powerful","ultimate","best","revolutionary","mind","blowing","unbelievable"}
-CONCRETE = re.compile(r"\b(\d[\d,.]*\s?(%|k|m|x|s|m|h)?|\$\d|\d+\s?(second|minute|hour|day|week|month|year)s?)\b", re.I)
-YOU = re.compile(r"\b(you|your|you're|youre|yourself)\b", re.I)
-STAKE = re.compile(r"\b(lose|lost|wasting|waste|quit|fail|broke|cost|risk|before|stop|never|die|dying|dead)\b", re.I)
-CURIOSITY = re.compile(r"\b(why|how|what|which|until|before|but|nobody|almost|except|reason|actually)\b", re.I)
+         "powerful","ultimate","best","revolutionary","mind","blowing","unbelievable",
+         # RU - the words that make a hook sound like an advert
+         "невероятный","невероятно","крутой","безумный","секретный","секретная","мощный",
+         "ультимативный","лучший","лучшая","революционный","магия","волшебный","волшебная",
+         "уникальный","эксклюзивный"}
+CONCRETE = re.compile(
+    r"\b(\d[\d,.]*\s?(%|k|m|x|s|m|h|тыс|млн)?|\$\d|\d+\s?(second|minute|hour|day|week|month|year)s?"
+    r"|\d+\s?(секунд|минут|час|дн|день|недел|месяц|год|тыс|млн)[а-яё]*)", re.I)
+YOU = re.compile(
+    r"\b(you|your|you're|youre|yourself|ты|тебя|тебе|тобой|твой|твоя|твои|твоего|"
+    r"вы|вас|вам|ваш|ваша|ваши|вашего)\b", re.I)
+STAKE = re.compile(
+    r"\b(lose|lost|wasting|waste|quit|fail|broke|cost|risk|before|stop|never|die|dying|dead|"
+    r"теряешь|потерять|потратишь|тратишь|впустую|зря|бросить|провал|ошибка|ошибку|"
+    r"риск|стоит|перестань|опоздаешь|упустишь|переписываешь|возишься|подолгу|мучаешься|переделываешь)\b", re.I)
+CURIOSITY = re.compile(
+    r"\b(why|how|what|which|until|before|but|nobody|almost|except|reason|actually|"
+    r"почему|как|что|зачем|какой|какая|какие|который|но|никто|почти|кроме|причина|"
+    r"на самом деле|потому|всё равно|дело (не )?в|что если|при[её]м)\b", re.I)
 
-def words(t): return re.findall(r"[a-z0-9'%$.]+", t.lower())
+CYRILLIC = re.compile(r"[а-яёА-ЯЁ]")
+
+def lang(t): return "ru" if CYRILLIC.search(t) else "en"
+
+def words(t): return re.findall(r"[\w'%$.]+", t.lower())
 
 def specificity(t):
     w = words(t)
@@ -69,9 +94,12 @@ PROPS = [("SPECIFICITY", specificity), ("ADDRESS", address), ("STAKES", stakes),
          ("CURIOSITY", curiosity), ("BREVITY", brevity)]
 
 def classify(t):
+    """Match against the English patterns, or the Russian ones when the hook is Cyrillic."""
+    key = "match_ru" if lang(t) == "ru" else "match"
     best, hits = None, 0
     for f in FORMULAS:
-        n = sum(1 for p in f["match"] if re.search(p, t, re.I))
+        pats = f.get(key) or f["match"]
+        n = sum(1 for p in pats if re.search(p, t, re.I))
         if n > hits: best, hits = f, n
     return (best["name"] if best else "Unclassified"), hits
 
@@ -92,7 +120,8 @@ def report(t, parts, verdict, name, hits):
     print(f"    {'VERDICT':<12} {verdict:3d}  {band(verdict)}")
     print(f"    formula      {name}" + (f"  ({hits} pattern{'s' if hits != 1 else ''} matched)" if hits else "  (no formula matched - that is usually a summary, not a hook)"))
     low = min(parts, key=parts.get)
-    print(f"    weakest      {low} - {FIX[low]}")
+    fix = FIX_RU if lang(t) == "ru" else FIX
+    print(f"    weakest      {low} - {fix[low]}")
 
 FIX = {
  "SPECIFICITY": "swap one adjective for a number, a name or a date",
@@ -100,6 +129,14 @@ FIX = {
  "STAKES": "name what it costs them to keep doing it the current way",
  "CURIOSITY": "cut the half of the sentence that answers itself",
  "BREVITY": "9 to 24 words. Read it out loud and stop where you run out of breath",
+}
+
+FIX_RU = {
+ "SPECIFICITY": "замени одно прилагательное на число, имя или дату",
+ "ADDRESS": "скажи «ты» в первых шести словах",
+ "STAKES": "назови, чем зрителю стоит продолжать делать по-старому",
+ "CURIOSITY": "убери половину фразы, которая сама отвечает на вопрос",
+ "BREVITY": "9-24 слова. Прочитай вслух и остановись там, где кончается дыхание",
 }
 
 def main():
@@ -119,7 +156,7 @@ def main():
                     "band": band(verdict), "formula": name, "matched": hits})
     out.sort(key=lambda r: -r["verdict"])
     if as_json:
-        print(json.dumps([{k: v for k, v in r.items() if k != "matched"} for r in out], indent=1)); return
+        print(json.dumps([{k: v for k, v in r.items() if k != "matched"} for r in out], indent=1, ensure_ascii=False)); return
     for r in out:
         report(r["hook"], r["properties"], r["verdict"], r["formula"], r["matched"])
     if len(out) > 1:

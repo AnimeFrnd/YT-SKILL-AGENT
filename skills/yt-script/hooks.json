@@ -1,6 +1,6 @@
 {
  "version": "1.0",
- "note": "21 hook formulas for YouTube. A YouTube hook is the first 15 seconds and it does three jobs: confirm the click the title promised, raise a question the viewer cannot close, and prove the payoff exists. A hook that only does the third is a summary and it leaks. Every formula here carries the shape, a worked example, the failure mode, and the patterns hookscore.py classifies transcribed speech against.",
+ "note": "21 hook formulas for YouTube. A YouTube hook is the first 15 seconds and it does three jobs: confirm the click the title promised, raise a question the viewer cannot close, and prove the payoff exists. A hook that only does the third is a summary and it leaks. Every formula here carries the shape, a worked example, the failure mode, and the patterns hookscore.py classifies transcribed speech against. Every formula also carries match_ru: the same shape written for Russian hooks, which hookscore.py uses automatically when the line is Cyrillic.",
  "rules": [
   "Confirm the title in the first sentence. A hook that ignores its own title is why people leave at 0:08.",
   "One idea. A hook carrying two promises keeps neither.",
@@ -19,6 +19,11 @@
     "\\b\\d+(\\.\\d+)?\\s?%",
     "\\b\\d+ (out of|in) \\d+\\b",
     "\\b\\d{2,}(,\\d{3})+\\b"
+   ],
+   "match_ru": [
+    "\\b\\d+([.,]\\d+)?\\s?%",
+    "\\b\\d+ (из|на) \\d+\\b",
+    "\\b\\d{2,}([ ,]\\d{3})+\\b"
    ]
   },
   {
@@ -31,6 +36,11 @@
     "\\bthis (channel|guy|creator|account)\\b",
     "\\bwent from .* to\\b",
     "\\bin (a|one|two|three|\\d+) (week|month|year)s?\\b"
+   ],
+   "match_ru": [
+    "\\bэтот (канал|парень|автор|аккаунт|человек)\\b",
+    "\\bс \\w+ (до|вырос)\\b",
+    "\\bза (\\d+|один|два|три|полгода) (недел|месяц|год)"
    ]
   },
   {
@@ -43,6 +53,11 @@
     "\\byou('re| are) (probably |still )?(doing|making)\\b",
     "\\bthe (mistake|reason) (everyone|most people|nobody)\\b",
     "\\bstop (doing )?\\b"
+   ],
+   "match_ru": [
+    "\\bты (наверное |всё ещё |сейчас |опять )?(делаешь|допускаешь|повторяешь|пишешь|читаешь|отправляешь|начинаешь|теряешь|переписываешь|переделываешь)\\b",
+    "\\b(главная |типичная |та самая )?ошибка\\b",
+    "\\bперестань\\b"
    ]
   },
   {
@@ -55,6 +70,11 @@
     "\\beveryone (says|thinks|tells you)\\b",
     "\\bis (actually )?wrong\\b",
     "\\bnobody (tells|talks about)\\b"
+   ],
+   "match_ru": [
+    "\\bвсе (говорят|советуют|думают|твердят)\\b",
+    "\\bна самом деле (не|нет|всё)\\b",
+    "\\bникто не (говорит|рассказывает|предупреждает)\\b"
    ]
   },
   {
@@ -67,6 +87,11 @@
     "\\bI('m| am) going to show you\\b",
     "\\bhere('s| is) (the|exactly)\\b",
     "\\bon screen\\b"
+   ],
+   "match_ru": [
+    "\\bя (тебе )?покажу\\b",
+    "\\bвот (он|она|оно|тот|та|это|сам)\\b",
+    "\\bна экране\\b"
    ]
   },
   {
@@ -78,6 +103,10 @@
    "match": [
     "\\bthe (best|worst|fastest|easiest|only)\\b",
     "\\bnumber one\\b"
+   ],
+   "match_ru": [
+    "\\b(самый|самая|самое|лучший|быстрейший|простой|единственный)\\b",
+    "\\bномер один\\b"
    ]
   },
   {
@@ -90,6 +119,11 @@
     "\\bin (the next )?\\d+ (seconds|minutes|hours)\\b",
     "\\bby the end of this video\\b",
     "\\bunder \\d+\\b"
+   ],
+   "match_ru": [
+    "\\bза \\d+ (секунд|минут|час)",
+    "\\bк концу (видео|ролика)\\b",
+    "\\bчерез \\d+ (минут|секунд)\\b"
    ]
   },
   {
@@ -102,6 +136,11 @@
     "\\bI (tried|spent|tested|let|gave)\\b",
     "\\bfor \\d+ (days|weeks|months)\\b",
     "\\bso you don'?t have to\\b"
+   ],
+   "match_ru": [
+    "\\bя (попробовал|проверил|потратил|тестировал|дал|пользовался)\\b",
+    "\\b(\\d+|тридцать|сорок) (дн|недел|месяц|минут)",
+    "\\bчтобы ты не\\b"
    ]
   },
   {
@@ -112,6 +151,10 @@
    "fails_when": "Must be the viewer's question, not yours. Pull it from your own comments.",
    "match": [
     "^(why|how|what|when|should|can|do|does|is)\\b",
+    "\\?\\s*$"
+   ],
+   "match_ru": [
+    "^(почему|как|что|зачем|когда|стоит|можно|нужно|неужели)\\b",
     "\\?\\s*$"
    ]
   },
@@ -125,6 +168,11 @@
     "\\bbefore\\b.*\\bafter\\b",
     "\\bthis was\\b.*\\bthis is\\b",
     "\\bused to\\b"
+   ],
+   "match_ru": [
+    "\\bбыло\\b[^.]*\\bстало\\b",
+    "\\bвот (это|так) было\\b",
+    "\\bраньше\\b"
    ]
   },
   {
@@ -138,6 +186,11 @@
     "\\bteardown\\b",
     "\\banalys(ed|ed|is|e)\\b",
     "\\bI pulled\\b"
+   ],
+   "match_ru": [
+    "\\bразобрал\\b",
+    "\\bразбор\\b",
+    "\\bя (взял|вытащил|собрал)\\b"
    ]
   },
   {
@@ -150,6 +203,11 @@
     "\\b\\w+ (plus|\\+) \\w+\\b",
     "\\bcombine\\b",
     "\\btogether\\b"
+   ],
+   "match_ru": [
+    "\\bплюс\\b",
+    "\\bвместе\\b",
+    "\\bс[оъ]?единил"
    ]
   },
   {
@@ -163,6 +221,12 @@
     "\\bdon'?t (upload|post|publish|start)\\b",
     "\\bbefore you\\b",
     "\\bstop\\b"
+   ],
+   "match_ru": [
+    "\\bне (загружай|публикуй|начинай|делай|отправляй)\\b",
+    "\\bдо того как\\b",
+    "\\bстоп\\b",
+    "\\bпока ты\\b"
    ]
   },
   {
@@ -174,6 +238,10 @@
    "match": [
     "^\\d+ \\w+",
     "\\b(here are|these are) \\d+\\b"
+   ],
+   "match_ru": [
+    "^(\\d+|два|три|четыре|пять|шесть|семь|десять) (вещ|штук|способ|шаг|при[её]м|текст|промпт|инструмент)",
+    "\\b(вот|это) \\d+\\b"
    ]
   },
   {
@@ -187,6 +255,12 @@
     "\\bscreenshot\\b",
     "\\bproof\\b",
     "\\breceipts?\\b"
+   ],
+   "match_ru": [
+    "\\bвот (скрин|экран|таблиц|цифр|письм|результат|заметк|текст|мой|моя|мои)",
+    "\\bскриншот\\b",
+    "\\bдоказательств",
+    "\\bвот (три|два|четыре|пять|несколько|такой|такая)\\b"
    ]
   },
   {
@@ -199,6 +273,11 @@
     "\\b(nobody|almost nobody|most people) (knows?|opens?|uses?)\\b",
     "\\bhidden\\b",
     "\\bburied\\b"
+   ],
+   "match_ru": [
+    "\\b(никто|почти никто) не\\b",
+    "\\bскрыт",
+    "\\bзакопан"
    ]
   },
   {
@@ -212,6 +291,12 @@
     "\\bnever\\b",
     "\\bin one\\b",
     "\\bzero\\b"
+   ],
+   "match_ru": [
+    "\\bбез (единого |одной |единой )?\\w+",
+    "\\bни разу\\b",
+    "\\bза один\\b",
+    "\\bноль\\b"
    ]
   },
   {
@@ -225,6 +310,12 @@
     "\\bversus\\b",
     "\\bwhich (one )?(is|wins)\\b",
     "\\bsame .* (three|two) ways\\b"
+   ],
+   "match_ru": [
+    "\\bпротив\\b",
+    "\\bvs\\.?\\b",
+    "\\bкакой (лучше|победил|сработал)\\b",
+    "\\bодин и тот же\\b"
    ]
   },
   {
@@ -237,6 +328,11 @@
     "\\bevery (video|post) .* starts\\b",
     "\\bit all (starts|started)\\b",
     "\\bthe (real )?reason\\b"
+   ],
+   "match_ru": [
+    "\\bкаждое (видео|письмо|заголовок)\\b[^.]*\\bначин",
+    "\\bвс[её] началось\\b",
+    "\\bнастоящая причина\\b"
    ]
   },
   {
@@ -250,6 +346,12 @@
     "\\bis changing\\b",
     "\\bno longer\\b",
     "\\bas of\\b"
+   ],
+   "match_ru": [
+    "\\bв этом (месяце|году|квартале)\\b",
+    "\\bменяется\\b",
+    "\\bбольше не\\b",
+    "\\bс \\d+ (января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)"
    ]
   },
   {
@@ -262,6 +364,11 @@
     "^if you\\b",
     "\\bfor (anyone|everyone|people) who\\b",
     "\\byou specifically\\b"
+   ],
+   "match_ru": [
+    "^если (ты|у тебя|вы|у вас)\\b",
+    "\\bдля (тех|всех|людей), кто\\b",
+    "\\bтебе лично\\b"
    ]
   }
  ]
