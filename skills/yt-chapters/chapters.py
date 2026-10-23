@@ -20,10 +20,22 @@ from deadair import load, parse_ts  # noqa: E402  (same parser, one implementati
 STOP = set("the a an of for to in on and or is are was were be been with this that it as at by from "
            "you your i my we our they them he she but so if then than there here what which who how "
            "when where why not no yes do does did just really very like about into over out up down "
-           "can could will would should have has had get got make made go going went one two".split())
+           "can could will would should have has had get got make made go going went one two "
+           # español
+           "el la los las un una unos unas de del al lo que qué por para con sin sobre entre "
+           "y o pero porque aunque como cuando donde dónde cuál cuáles quién quiénes cómo "
+           "es son era eran ser estar está están estoy estamos hay haber tiene tienen tener "
+           "su sus mi mis tu tus nos nuestro nuestra me te se le les ya muy más menos "
+           "esto esta este estos estas eso esa ese esos esas aquí ahí allí ahora luego "
+           "no sí también tanto algo nada todo todos toda todas otro otra cada vez "
+           "hacer hace hacen puede pueden podemos vamos vas voy va van ver "
+           "entonces bueno pues claro listo vale digamos osea desde hasta".split())
 
+# Letters in any script, with an apostrophe allowed inside a word so "don't" stays one token.
+# [a-z']{4,} cut every word at its first accent: "codificación" became "codificaci".
 def keywords(text):
-    return {w for w in re.findall(r"[a-z']{4,}", text.lower()) if w not in STOP}
+    words = re.findall(r"[^\W\d_]+(?:'[^\W\d_]+)*", text.lower())
+    return {w for w in words if len(w) >= 4 and w not in STOP}
 
 def mmss(t):
     t = int(t); h, m, s = t // 3600, (t % 3600) // 60, t % 60
