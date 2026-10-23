@@ -14,8 +14,13 @@ runtime you would land on, and you apply it in whatever editor you use. Nothing 
 """
 import json, os, re, sys
 
-FILLER_ONLY = re.compile(r"^[\s,.-]*((um+|uh+|er+|ah+|so|okay|ok|right|yeah|like|anyway|basically|"
-                         r"actually|you know|i mean|let me see|hold on)[\s,.-]*)+$", re.I)
+FILLER_ONLY = re.compile(r"^[\s,.\-¿?¡!…]*((um+|uh+|er+|ah+|so|okay|ok|right|yeah|like|anyway|basically|"
+                         r"actually|you know|i mean|let me see|hold on|"
+                         # español
+                         r"eh+|em+|mm+|este+|esto+|bueno|pues|entonces|o sea|osea|digamos|"
+                         r"a ver|vale|listo|ya|claro|exacto|verdad|no s[eé]|es decir|"
+                         r"c[oó]mo se llama|qu[eé] m[aá]s|d[eé]jame ver|un momento|"
+                         r"perd[oó]n|disculpa|a la orden)[\s,.\-¿?¡!…]*)+$", re.I)
 
 def parse_ts(s):
     s = s.strip().replace(",", ".")
@@ -38,7 +43,9 @@ def load(path):
             cur[2].append(line.strip())
     return [(a, b, " ".join(t)) for a, b, t in cues if t]
 
-def norm(t): return re.sub(r"[^a-z ]", "", t.lower()).split()
+# Letters only, in any script. [^a-z ] dropped every accented and non-Latin character, which turned
+# "déjame" into "djame" and broke the retake comparison for most languages.
+def norm(t): return re.sub(r"[\d_]|[^\w ]", "", t.lower()).split()
 
 def main():
     a = sys.argv[1:]
